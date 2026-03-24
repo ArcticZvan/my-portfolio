@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "title": "Arctic Zvan | 个人作品集",
+    "description": "全栈开发者，热爱构建优雅的 Web 应用"
+  },
+  "nav": {
+    "home": "首页",
+    "about": "关于",
+    "journey": "经历",
+    "skills": "技能",
+    "projects": "项目",
+    "blog": "博客",
+    "contact": "联系"
+  },
+  "hero": {
+    "greeting": "你好，我是",
+    "name": "Arctic Zvan",
+    "role": "全栈开发者",
+    "description": "热爱将创意转化为优雅、高性能的 Web 应用，专注于前沿技术和极致用户体验。",
+    "cta": "联系我",
+    "stats": {
+      "projects": "个项目",
+      "experience": "年经验",
+      "satisfaction": "满意度"
+    }
+  },
+  "about": {
+    "title": "关于我",
+    "description": "我是一名全栈开发者，热爱探索前沿技术，擅长构建高性能的 Web 应用。目前就读于北京邮电大学物联网工程专业，专注于 React/Next.js 生态和 AI 应用开发。我相信代码是一种艺术，优秀的产品源于对细节的极致追求。",
+    "highlight1": "全栈开发",
+    "highlight2": "AI 探索者",
+    "highlight3": "开源爱好者"
+  },
+  "journey": {
+    "title": "我的经历",
+    "subtitle": "教育与工作历程"
+  },
+  "skills": {
+    "title": "技术栈",
+    "subtitle": "我掌握的技术和工具",
+    "categories": {
+      "languages": "编程语言",
+      "frameworks": "框架与库",
+      "tools": "工具与平台",
+      "databases": "数据库"
+    }
+  },
+  "projects": {
+    "title": "精选项目",
+    "subtitle": "我的一些代表作品",
+    "viewProject": "查看项目",
+    "viewCode": "查看源码"
+  },
+  "blog": {
+    "title": "博客",
+    "subtitle": "技术思考与分享",
+    "readMore": "阅读更多",
+    "backToBlog": "返回博客"
+  },
+  "contact": {
+    "title": "联系我",
+    "subtitle": "一起创造些伟大的东西吧",
+    "form": {
+      "name": "姓名",
+      "email": "邮箱",
+      "subject": "主题",
+      "message": "消息",
+      "send": "发送消息",
+      "sending": "发送中...",
+      "success": "消息已发送！",
+      "error": "发送失败，请重试"
+    }
+  },
+  "footer": {
+    "rights": "保留所有权利",
+    "builtWith": "基于 Next.js 构建"
+  },
+  "common": {
+    "loading": "加载中...",
+    "switchLang": "English"
+  }
+}

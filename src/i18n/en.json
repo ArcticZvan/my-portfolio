@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "title": "Arctic Zvan | Portfolio",
+    "description": "Full-stack developer passionate about building elegant web applications"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "journey": "Journey",
+    "skills": "Skills",
+    "projects": "Projects",
+    "blog": "Blog",
+    "contact": "Contact"
+  },
+  "hero": {
+    "greeting": "Hi, I'm",
+    "name": "Arctic Zvan",
+    "role": "Full Stack Developer",
+    "description": "Passionate about transforming creative ideas into elegant, high-performance web applications with cutting-edge tech and exceptional user experience.",
+    "cta": "Get in Touch",
+    "stats": {
+      "projects": "Projects",
+      "experience": "Years Exp.",
+      "satisfaction": "Satisfaction"
+    }
+  },
+  "about": {
+    "title": "About Me",
+    "description": "I'm a full-stack developer passionate about cutting-edge technology, specializing in building high-performance web applications. Currently studying IoT Engineering at BUPT, focusing on the React/Next.js ecosystem and AI application development. I believe code is an art form, and great products come from relentless attention to detail.",
+    "highlight1": "Full-Stack Dev",
+    "highlight2": "AI Explorer",
+    "highlight3": "Open Source"
+  },
+  "journey": {
+    "title": "My Journey",
+    "subtitle": "Education & work experience"
+  },
+  "skills": {
+    "title": "Tech Stack",
+    "subtitle": "Technologies and tools I work with",
+    "categories": {
+      "languages": "Languages",
+      "frameworks": "Frameworks & Libraries",
+      "tools": "Tools & Platforms",
+      "databases": "Databases"
+    }
+  },
+  "projects": {
+    "title": "Featured Projects",
+    "subtitle": "Some of my notable work",
+    "viewProject": "View Project",
+    "viewCode": "View Source"
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Thoughts & tutorials on tech",
+    "readMore": "Read More",
+    "backToBlog": "Back to Blog"
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "Let's build something great together",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "subject": "Subject",
+      "message": "Message",
+      "send": "Send Message",
+      "sending": "Sending...",
+      "success": "Message sent!",
+      "error": "Failed to send. Please try again."
+    }
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "builtWith": "Built with Next.js"
+  },
+  "common": {
+    "loading": "Loading...",
+    "switchLang": "中文"
+  }
+}
