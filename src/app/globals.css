@@ -71,6 +71,25 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.35));
+}
+
+.art-text {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(139, 92, 246, 0.9);
+  background: linear-gradient(
+    135deg,
+    var(--accent) 0%,
+    #c084fc 40%,
+    var(--accent-secondary) 70%,
+    #818cf8 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.7))
+    drop-shadow(0 0 30px rgba(139, 92, 246, 0.4))
+    drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
 }
 
 .glass-card {

@@ -21,26 +21,67 @@ export function About() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      const section = sectionRef.current;
+      if (!section) {
+        return;
+      }
+
+      // Entrance: left side slides in
       gsap.fromTo(
         ".about-left",
-        { x: -50, opacity: 0 },
+        { x: -60, opacity: 0 },
         {
           x: 0,
           opacity: 1,
-          duration: 0.9,
+          duration: 1,
           ease: "power3.out",
           scrollTrigger: { trigger: ".about-left", start: "top 85%" },
         }
       );
+
+      // redoyanulhaque-style text parallax:
+      // each element on the right is scrub-linked with different speeds
+      const rightElements = section.querySelectorAll<HTMLElement>(".about-line");
+      rightElements.forEach((el, i) => {
+        const speed = 30 + i * 25;
+        // Entrance reveal
+        gsap.fromTo(
+          el,
+          { y: 40 + i * 10, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            delay: i * 0.1,
+            ease: "power3.out",
+            scrollTrigger: { trigger: el, start: "top 90%" },
+          }
+        );
+        // Continuous parallax while scrolling
+        gsap.to(el, {
+          y: -speed,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 0.8,
+          },
+        });
+      });
+
+      // Tags stagger in
       gsap.fromTo(
-        ".about-right",
-        { x: 50, opacity: 0 },
+        ".about-tag",
+        { y: 20, opacity: 0, scale: 0.9 },
         {
-          x: 0,
+          y: 0,
           opacity: 1,
-          duration: 0.9,
-          ease: "power3.out",
-          scrollTrigger: { trigger: ".about-right", start: "top 85%" },
+          scale: 1,
+          stagger: 0.12,
+          duration: 0.5,
+          ease: "back.out(1.5)",
+          scrollTrigger: { trigger: ".about-tags", start: "top 90%" },
         }
       );
     }, sectionRef);
@@ -51,31 +92,31 @@ export function About() {
     <section
       ref={sectionRef}
       id="about"
-      className="relative px-6 py-24 md:py-32"
+      className="relative overflow-hidden px-6 py-32 md:py-44"
     >
       <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2 md:gap-16">
-        {/* Left - stacked image cards */}
+        {/* Left - stacked image cards with scroll-driven fan */}
         <div className="about-left flex justify-center">
           <ImageStack />
         </div>
 
-        {/* Right - text */}
-        <div className="about-right">
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-accent">
+        {/* Right - text with per-line parallax */}
+        <div>
+          <h2 className="about-line art-text text-3xl font-black uppercase tracking-[0.2em] md:text-4xl lg:text-5xl">
             {t("title")}
           </h2>
 
-          <p className="mt-6 text-lg leading-relaxed text-muted-foreground md:text-xl">
+          <p className="about-line mt-8 text-lg leading-relaxed text-muted-foreground md:text-xl">
             {t("description")}
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="about-line about-tags mt-8 flex flex-wrap gap-3">
             {HIGHLIGHTS.map(({ key, icon: Icon }) => (
               <div
                 key={key}
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground"
+                className="about-tag inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-4 py-2 text-sm font-medium text-foreground shadow-[0_0_12px_rgba(139,92,246,0.1)]"
               >
-                <Icon className="h-4 w-4 text-accent" />
+                <Icon className="h-4 w-4 text-accent drop-shadow-[0_0_6px_rgba(139,92,246,0.5)]" />
                 {t(key)}
               </div>
             ))}
