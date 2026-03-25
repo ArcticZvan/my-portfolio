@@ -67,11 +67,46 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+  background: linear-gradient(135deg, var(--accent), #c084fc, var(--accent-secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.35));
+  filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.5))
+    drop-shadow(0 0 25px rgba(139, 92, 246, 0.25))
+    drop-shadow(0 3px 4px rgba(0, 0, 0, 0.3));
+}
+
+.jelly-text {
+  background: linear-gradient(
+    135deg,
+    var(--accent) 0%,
+    #c084fc 30%,
+    #e879f9 50%,
+    #c084fc 70%,
+    var(--accent-secondary) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 16px rgba(139, 92, 246, 0.7))
+    drop-shadow(0 0 40px rgba(139, 92, 246, 0.35))
+    drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+  animation: jelly 2.5s ease-in-out infinite;
+}
+
+@keyframes jelly {
+  0%, 100% {
+    transform: scale(1, 1);
+  }
+  25% {
+    transform: scale(1.02, 0.98);
+  }
+  50% {
+    transform: scale(0.98, 1.02);
+  }
+  75% {
+    transform: scale(1.01, 0.99);
+  }
 }
 
 .art-text {

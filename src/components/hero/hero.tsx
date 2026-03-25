@@ -81,7 +81,7 @@ export function Hero({ ready }: { ready: boolean }) {
           ref={headingRef}
           className="text-5xl font-bold leading-tight tracking-tight opacity-0 md:text-7xl lg:text-8xl"
         >
-          <span className="gradient-text">{t("name")}</span>
+          <span className="jelly-text inline-block">{t("name")}</span>
           <br />
           <span className="text-3xl font-medium text-muted-foreground md:text-4xl lg:text-5xl">
             {t("role")}

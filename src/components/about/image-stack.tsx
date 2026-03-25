@@ -76,9 +76,9 @@ function CardLayer({
   bg: string;
   label: string;
 }) {
-  const baseRotate = (stackPos - 1) * 3;
+  const baseRotate = (stackPos - 1) * 1;
   const fanRotate = (stackPos - 1) * 12;
-  const baseX = stackPos * 12;
+  const baseX = stackPos * 18;
   const fanX = (stackPos - 1) * 30;
 
   const rotate = useTransform(spread, [0, 1], [baseRotate, fanRotate]);
