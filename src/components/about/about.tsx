@@ -96,7 +96,7 @@ export function About() {
     >
       <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2 md:gap-16">
         {/* Left - stacked image cards with scroll-driven fan */}
-        <div className="about-left flex justify-center">
+        <div className="about-left relative flex justify-center">
           <ImageStack />
         </div>
 

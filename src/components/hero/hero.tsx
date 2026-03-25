@@ -11,50 +11,47 @@ export function Hero({ ready }: { ready: boolean }) {
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const subRef = useRef<HTMLParagraphElement>(null);
-  const animatedRef = useRef(false);
 
   useEffect(() => {
-    if (!ready || animatedRef.current) {
+    if (!ready) {
       return;
     }
-    animatedRef.current = true;
 
     const ctx = gsap.context(() => {
+      gsap.set(".hero-badge", { opacity: 1, scale: 1 });
+      gsap.set(headingRef.current, { y: 0, opacity: 1 });
+      gsap.set(subRef.current, { y: 0, opacity: 1 });
+      gsap.set(".hero-cta", { y: 0, opacity: 1 });
+      gsap.set(".hero-scroll", { opacity: 1 });
+
       const tl = gsap.timeline({ delay: 0.15 });
 
-      tl.fromTo(
-        ".hero-badge",
-        { opacity: 0, scale: 0.9 },
-        { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }
-      );
+      tl.from(".hero-badge", {
+        opacity: 0,
+        scale: 0.9,
+        duration: 0.5,
+        ease: "power3.out",
+      });
 
-      tl.fromTo(
+      tl.from(
         headingRef.current,
-        { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.9, ease: "power3.out" },
+        { y: 50, opacity: 0, duration: 0.9, ease: "power3.out" },
         "-=0.2"
       );
 
-      tl.fromTo(
+      tl.from(
         subRef.current,
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" },
+        { y: 30, opacity: 0, duration: 0.7, ease: "power3.out" },
         "-=0.4"
       );
 
-      tl.fromTo(
+      tl.from(
         ".hero-cta",
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" },
+        { y: 20, opacity: 0, duration: 0.6, ease: "power3.out" },
         "-=0.3"
       );
 
-      tl.fromTo(
-        ".hero-scroll",
-        { opacity: 0 },
-        { opacity: 1, duration: 0.6 },
-        "-=0.2"
-      );
+      tl.from(".hero-scroll", { opacity: 0, duration: 0.6 }, "-=0.2");
     }, sectionRef);
 
     return () => ctx.revert();
