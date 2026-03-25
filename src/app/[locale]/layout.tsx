@@ -11,6 +11,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Navbar } from "@/components/navbar/navbar";
 import { Footer } from "@/components/footer/footer";
 import { Toaster } from "react-hot-toast";
+import { SideSocials } from "@/components/ui/side-socials";
 import type { Metadata } from "next";
 
 const geistSans = Geist({
@@ -87,6 +88,7 @@ export default async function LocaleLayout({ children, params }: Props) {
               <main className="flex-1">{children}</main>
               <Footer />
             </div>
+            <SideSocials />
             <Toaster
               position="bottom-right"
               toastOptions={{

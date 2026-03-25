@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Mail } from "lucide-react";
 import { GithubIcon } from "@/components/ui/icons";
 import toast from "react-hot-toast";
 
@@ -183,15 +183,22 @@ export function Contact() {
         </form>
 
         {/* Social links */}
-        <div className="mt-12 flex items-center justify-center gap-4">
+        <div className="mt-12 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <a
-            href="https://github.com"
+            href="https://github.com/ArcticZvan"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            aria-label="GitHub"
+            className="flex h-10 items-center gap-2 rounded-lg border border-border px-4 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            <GithubIcon className="h-5 w-5" />
+            <GithubIcon className="h-4 w-4" />
+            <span className="text-sm">@ArcticZvan</span>
+          </a>
+          <a
+            href="mailto:arcticzvan@gmail.com"
+            className="flex h-10 items-center gap-2 rounded-lg border border-border px-4 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <Mail className="h-4 w-4" />
+            <span className="text-sm">arcticzvan@gmail.com</span>
           </a>
         </div>
       </div>

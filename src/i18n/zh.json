@@ -66,6 +66,7 @@
     }
   },
   "footer": {
+    "thanks": "感谢你参观我的个人主页 ✨",
     "rights": "保留所有权利",
     "builtWith": "基于 Next.js 构建"
   },
