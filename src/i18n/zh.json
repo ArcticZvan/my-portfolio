@@ -36,14 +36,8 @@
     "subtitle": "教育与工作历程"
   },
   "skills": {
-    "title": "技术栈",
-    "subtitle": "我掌握的技术和工具",
-    "categories": {
-      "languages": "编程语言",
-      "frameworks": "框架与库",
-      "tools": "工具与平台",
-      "databases": "数据库"
-    }
+    "title": "Tech Stack",
+    "subtitle": "我掌握的技术和工具"
   },
   "projects": {
     "title": "精选项目",

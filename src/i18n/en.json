@@ -37,13 +37,7 @@
   },
   "skills": {
     "title": "Tech Stack",
-    "subtitle": "Technologies and tools I work with",
-    "categories": {
-      "languages": "Languages",
-      "frameworks": "Frameworks & Libraries",
-      "tools": "Tools & Platforms",
-      "databases": "Databases"
-    }
+    "subtitle": "Technologies and tools I work with"
   },
   "projects": {
     "title": "Featured Projects",

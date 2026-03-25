@@ -102,7 +102,7 @@ export function About() {
 
         {/* Right - text with per-line parallax */}
         <div>
-          <h2 className="about-line art-text text-3xl font-black uppercase tracking-[0.2em] md:text-4xl lg:text-5xl">
+          <h2 className="about-line art-text text-3xl uppercase tracking-[0.2em] md:text-4xl lg:text-5xl">
             {t("title")}
           </h2>
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { experiences } from "@/data/experience";
-import { skillCategories } from "@/data/skills";
+import { skills } from "@/data/skills";
 import { projects } from "@/data/projects";
 
 describe("Data integrity", () => {
@@ -16,14 +16,12 @@ describe("Data integrity", () => {
     }
   });
 
-  it("skill categories should have valid structure", () => {
-    expect(skillCategories.length).toBeGreaterThan(0);
-    for (const cat of skillCategories) {
-      expect(cat.key).toBeTruthy();
-      expect(cat.skills.length).toBeGreaterThan(0);
-      for (const skill of cat.skills) {
-        expect(skill.name).toBeTruthy();
-      }
+  it("skills should have valid structure", () => {
+    expect(skills.length).toBeGreaterThan(0);
+    for (const skill of skills) {
+      expect(skill.name).toBeTruthy();
+      expect(skill.url).toBeTruthy();
+      expect(skill.icon).toBeTruthy();
     }
   });
 
