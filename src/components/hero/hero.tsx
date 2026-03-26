@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
+import { OrbitRing } from "./orbit-ring";
 
 export function Hero({ ready }: { ready: boolean }) {
   const t = useTranslations("hero");
@@ -63,10 +64,7 @@ export function Hero({ ready }: { ready: boolean }) {
       id="hero"
       className="relative flex min-h-screen items-center justify-center overflow-hidden px-6"
     >
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-32 top-1/4 h-96 w-96 rounded-full bg-violet-500/10 blur-[128px]" />
-        <div className="absolute -right-32 bottom-1/4 h-96 w-96 rounded-full bg-indigo-500/10 blur-[128px]" />
-      </div>
+      <OrbitRing ready={ready} />
 
       <div className="relative z-10 mx-auto max-w-4xl text-center">
         <div className="hero-badge mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-sm text-muted-foreground opacity-0">

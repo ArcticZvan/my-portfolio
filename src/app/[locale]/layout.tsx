@@ -12,6 +12,7 @@ import { Navbar } from "@/components/navbar/navbar";
 import { Footer } from "@/components/footer/footer";
 import { Toaster } from "react-hot-toast";
 import { SideSocials } from "@/components/ui/side-socials";
+import { FluidBackground } from "@/components/ui/fluid-background";
 import type { Metadata } from "next";
 
 const geistSans = Geist({
@@ -83,7 +84,8 @@ export default async function LocaleLayout({ children, params }: Props) {
       <body className="min-h-screen antialiased">
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>
-            <div className="flex min-h-screen flex-col">
+            <FluidBackground />
+            <div className="relative z-10 flex min-h-screen flex-col">
               <Navbar />
               <main className="flex-1">{children}</main>
               <Footer />
