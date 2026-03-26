@@ -56,19 +56,12 @@ export function OrbitRing({ ready }: { ready: boolean }) {
       }
 
       const introElapsed = time - introStartRef.current;
-      const introDuration = 2.5;
+      const introDuration = 6.0;
       const introProgress = easeOutExpo(Math.min(introElapsed / introDuration, 1));
 
-      // Intro: scale from tiny to full
-      const scale = 0.03 + introProgress * 0.97;
-      // Intro: tilt flips from nearly edge-on to resting angle
-      const tiltStart = -1.4;
-      const tiltEnd = -0.18;
-      const tilt = tiltStart + (tiltEnd - tiltStart) * introProgress;
-      // Intro: ry ratio changes to simulate 3D flip
-      const ryRatioStart = 0.6;
-      const ryRatioEnd = 0.25;
-      const ryRatio = ryRatioStart + (ryRatioEnd - ryRatioStart) * introProgress;
+      const scale = 0.65 + introProgress * 0.35;
+      const tilt = -0.18;
+      const ryRatio = 0.25;
 
       const cx = w / 2;
       const cy = h / 2;

@@ -11,6 +11,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@fontsource/playfair-display": "^5.2.8",
     "@gsap/react": "^2.1.2",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
