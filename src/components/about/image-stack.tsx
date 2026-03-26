@@ -8,11 +8,14 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
+import Image from "next/image";
 
-const PLACEHOLDER_IMAGES = [
-  { id: 1, bg: "from-violet-600/20 to-indigo-600/20", label: "Photo 1" },
-  { id: 2, bg: "from-indigo-600/20 to-blue-600/20", label: "Photo 2" },
-  { id: 3, bg: "from-purple-600/20 to-violet-600/20", label: "Photo 3" },
+// 替换为你的真实图片路径（放在 public/images/ 下）
+// 格式：JPG/PNG/WebP，推荐 680×880px 竖版
+const IMAGES = [
+  { id: 1, src: "/images/photo-1.jpg", alt: "Photo 1" },
+  { id: 2, src: "/images/photo-2.jpg", alt: "Photo 2" },
+  { id: 3, src: "/images/photo-3.jpg", alt: "Photo 3" },
 ];
 
 export function ImageStack() {
@@ -45,14 +48,14 @@ export function ImageStack() {
 
       <AnimatePresence initial={false}>
         {order.map((imgIndex, stackPos) => {
-          const img = PLACEHOLDER_IMAGES[imgIndex];
+          const img = IMAGES[imgIndex];
           return (
             <CardLayer
               key={img.id}
               stackPos={stackPos}
               spread={spread}
-              bg={img.bg}
-              label={img.label}
+              src={img.src}
+              alt={img.alt}
             />
           );
         })}
@@ -68,13 +71,13 @@ export function ImageStack() {
 function CardLayer({
   stackPos,
   spread,
-  bg,
-  label,
+  src,
+  alt,
 }: {
   stackPos: number;
   spread: MotionValue<number>;
-  bg: string;
-  label: string;
+  src: string;
+  alt: string;
 }) {
   const baseRotate = (stackPos - 1) * 1;
   const fanRotate = (stackPos - 1) * 12;
@@ -93,10 +96,14 @@ function CardLayer({
       style={{ rotate, x, y, scale, zIndex }}
       className="absolute inset-0 overflow-hidden rounded-2xl border-2 border-violet-500/30 shadow-[0_0_30px_rgba(139,92,246,0.15)]"
     >
-      <div
-        className={`flex h-full w-full items-center justify-center bg-gradient-to-br ${bg} bg-card`}
-      >
-        <span className="text-sm text-muted-foreground/50">{label}</span>
+      <div className="relative h-full w-full bg-card">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 300px, 340px"
+        />
       </div>
     </motion.div>
   );

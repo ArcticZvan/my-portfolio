@@ -17,5 +17,26 @@ export const experiences: Experience[] = [
     location: { zh: "北京,中国", en: "Beijing, China" },
     description: { zh: ["专业课程：云计算、物联网、操作系统、计算机网络"], en: ["Coursework: Cloud Computing, Internet of Things, Operating Systems, Computer Networks"] },
     type: "education"
-  }
+  },
+  {
+    id: "work-1",          // 唯一 ID
+    company: {
+      zh: "新石器慧通（北京）科技有限公司",
+      en: "Neolix (Beijing) Technology Co., Ltd.",
+    },
+    role: {
+      zh: "DevOps工程师",
+      en: "DevOps Engineer",
+    },
+    period: "2026 - Present",
+    location: {
+      zh: "北京,中国",
+      en: "Beijing, China",
+    },
+    description: {
+      zh: ["负责公司内部CI/CD流水线搭建和维护", "负责公司内部自动化/AI化运维工具开发", "参与公司AI Agent和MCP开发"],
+      en: ["Responsible for building and maintaining the internal CI/CD pipeline", "Responsible for developing the internal automation maintenance tools", "Participate in the development of company AI Agent and MCP"],
+    },
+    type: "work",
+  },
 ];
