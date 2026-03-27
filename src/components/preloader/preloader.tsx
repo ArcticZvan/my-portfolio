@@ -181,12 +181,14 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
 
       const p = Math.min(phaseTime / DURATIONS[phase], 1);
 
-      // Opaque background
+      // Background + fluid, both affected by phase 3 fade
+      const masterAlpha = phase === 3 ? 1 - p : 1;
+      ctx!.clearRect(0, 0, w, h);
+      ctx!.globalAlpha = masterAlpha;
       ctx!.fillStyle = "#0a0a0f";
       ctx!.fillRect(0, 0, w, h);
-
-      // Draw fluid blobs + sun on top
       drawFluid(time);
+      ctx!.globalAlpha = 1;
 
       const arcticY = cy - fontSize * 0.45;
       const zvanY = cy + fontSize * 0.45;
@@ -275,9 +277,7 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
         const ringRy = ringRx * 0.25;
         const alpha = (1 - p) * 0.8;
 
-        // Fade the whole preloader
-        ctx!.globalAlpha = 1 - p;
-
+        ctx!.globalAlpha = masterAlpha;
         ctx!.save();
         ctx!.translate(cx, cy);
         ctx!.rotate(-0.18);
@@ -319,7 +319,7 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 z-[100]"
-      style={{ background: "#0a0a0f" }}
+      style={{ background: "transparent" }}
     />
   );
 }
