@@ -4,15 +4,16 @@ import { useTranslations } from "next-intl";
 import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Code2, Bot, Heart } from "lucide-react";
+import { Brain, Layers, CloudCog, Users } from "lucide-react";
 import { ImageStack } from "./image-stack";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const HIGHLIGHTS = [
-  { key: "highlight1", icon: Code2 },
-  { key: "highlight2", icon: Bot },
-  { key: "highlight3", icon: Heart },
+  { key: "highlight1", icon: Brain },
+  { key: "highlight2", icon: Layers },
+  { key: "highlight3", icon: CloudCog },
+  { key: "highlight4", icon: Users },
 ] as const;
 
 export function About() {
