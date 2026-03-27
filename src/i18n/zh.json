@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Arctic Zvan | 个人作品集",
+    "title": "Arctic Zvan | 个人网站",
     "description": "全栈开发者，热爱构建优雅的 Web 应用"
   },
   "nav": {
@@ -15,9 +15,9 @@
   "hero": {
     "greeting": "你好，我是",
     "name": "Arctic Zvan",
-    "role": "全栈开发者",
-    "description": "热爱将创意转化为优雅、高性能的 Web 应用，专注于前沿技术和极致用户体验。",
-    "cta": "联系我",
+    "role": "开发者、DevOps工程师、AI探索者",
+    "description": "热爱将创意转化为优雅、高性能的 Web 应用，专注于前沿技术的探索和极致的用户体验，相信Agent将改变世界。",
+    "cta": "与我联系",
     "stats": {
       "projects": "个项目",
       "experience": "年经验",
@@ -27,9 +27,10 @@
   "about": {
     "title": "关于我",
     "description": "我是一名全栈开发者，热爱探索前沿技术，擅长构建高性能的 Web 应用。目前就读于北京邮电大学物联网工程专业，专注于 React/Next.js 生态和 AI 应用开发。我相信代码是一种艺术，优秀的产品源于对细节的极致追求。",
-    "highlight1": "全栈开发",
-    "highlight2": "AI 探索者",
-    "highlight3": "开源爱好者"
+    "highlight1": "AI 探索与应用",
+    "highlight2": "全栈开发",
+    "highlight3": "云原生",
+    "highlight4": "开源社区"
   },
   "journey": {
     "title": "我的经历",

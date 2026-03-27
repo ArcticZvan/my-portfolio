@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Arctic Zvan | Portfolio",
+    "title": "Arctic Zvan | Personal Website",
     "description": "Full-stack developer passionate about building elegant web applications"
   },
   "nav": {
@@ -15,8 +15,8 @@
   "hero": {
     "greeting": "Hi, I'm",
     "name": "Arctic Zvan",
-    "role": "Full Stack Developer",
-    "description": "Passionate about transforming creative ideas into elegant, high-performance web applications with cutting-edge tech and exceptional user experience.",
+    "role": "Developer, DevOps Engineer, AI Explorer",
+    "description": "Passionate about transforming creative ideas into elegant, high-performance web applications with cutting-edge tech and exceptional user experience. Believe Agent will change the world.",
     "cta": "Get in Touch",
     "stats": {
       "projects": "Projects",
@@ -27,9 +27,10 @@
   "about": {
     "title": "About Me",
     "description": "I'm a full-stack developer passionate about cutting-edge technology, specializing in building high-performance web applications. Currently studying IoT Engineering at BUPT, focusing on the React/Next.js ecosystem and AI application development. I believe code is an art form, and great products come from relentless attention to detail.",
-    "highlight1": "Full-Stack Dev",
-    "highlight2": "AI Explorer",
-    "highlight3": "Open Source"
+    "highlight1": "AI Exploration & Application",
+    "highlight2": "Full-Stack Development",
+    "highlight3": "Cloud Native",
+    "highlight4": "Open Source Community"
   },
   "journey": {
     "title": "My Journey",

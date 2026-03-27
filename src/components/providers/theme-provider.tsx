@@ -35,16 +35,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const stored = localStorage.getItem("theme") as Theme | null;
-    if (stored) {
-      setThemeState(stored);
-      document.documentElement.classList.toggle("dark", stored === "dark");
-    } else {
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      const initial = prefersDark ? "dark" : "light";
-      setThemeState(initial);
-      document.documentElement.classList.toggle("dark", initial === "dark");
+    const initial = stored || "dark";
+    setThemeState(initial);
+    document.documentElement.classList.toggle("dark", initial === "dark");
+    if (!stored) {
+      localStorage.setItem("theme", "dark");
     }
     setMounted(true);
   }, []);

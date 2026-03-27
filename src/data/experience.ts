@@ -19,6 +19,15 @@ export const experiences: Experience[] = [
     type: "education"
   },
   {
+    id: "edu-2",
+    company: { zh: "伦敦玛丽女王大学", en: "Queen Mary University of London" },
+    role: { zh: "物联网工程 本科", en: "B.S. in Internet of Things Engineering" },
+    period: "2022 - 2026",
+    location: { zh: "伦敦,英国", en: "London, United Kingdom" },
+    description: { zh: ["专业课程：机器学习、数字音频处理、数据结构、中间件"], en: ["Coursework: Machine Learning, Middleware, Data Structures, Digital Audio Processing"] },
+    type: "education"
+  },
+  {
     id: "work-1",          // 唯一 ID
     company: {
       zh: "新石器慧通（北京）科技有限公司",

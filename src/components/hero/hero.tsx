@@ -85,7 +85,7 @@ export function Hero({ ready }: { ready: boolean }) {
 
         <p
           ref={subRef}
-          className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground opacity-0 md:text-xl"
+          className="mx-auto mt-6 max-w-4xl text-lg leading-relaxed text-muted-foreground opacity-0 md:text-xl"
         >
           {t("description")}
         </p>
