@@ -1,10 +1,24 @@
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { getBlogPost, getBlogPosts } from "@/lib/mdx";
-import { BlogArticle } from "@/components/blog/blog-article";
+import { BlogHeader } from "@/components/blog/blog-header";
+import { MDXRemote } from "next-mdx-remote/rsc";
+import rehypePrettyCode from "rehype-pretty-code";
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
+};
+
+const mdxOptions = {
+  rehypePlugins: [
+    [
+      rehypePrettyCode,
+      {
+        theme: "github-dark-default",
+        keepBackground: true,
+      },
+    ],
+  ],
 };
 
 export async function generateStaticParams() {
@@ -31,5 +45,16 @@ export default async function BlogPostPage({ params }: Props) {
     notFound();
   }
 
-  return <BlogArticle post={post} />;
+  return (
+    <article className="mx-auto max-w-3xl px-6 pb-24 pt-32">
+      <BlogHeader post={post} />
+
+      <div className="glass-card p-6 md:p-10">
+        <div className="blog-content">
+          {/* @ts-expect-error async RSC */}
+          <MDXRemote source={post.content} options={{ mdxOptions }} />
+        </div>
+      </div>
+    </article>
+  );
 }

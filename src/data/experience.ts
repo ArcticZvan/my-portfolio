@@ -34,8 +34,8 @@ export const experiences: Experience[] = [
       en: "Neolix (Beijing) Technology Co., Ltd.",
     },
     role: {
-      zh: "DevOps工程师",
-      en: "DevOps Engineer",
+      zh: "DevOps工程师, 无人车独角兽公司",
+      en: "DevOps Engineer, RoboVan Unicorn Company",
     },
     period: "2026 - Present",
     location: {

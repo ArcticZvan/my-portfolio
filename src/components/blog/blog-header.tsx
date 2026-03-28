@@ -2,28 +2,14 @@
 
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { MDXRemote } from "next-mdx-remote/rsc";
-import rehypePrettyCode from "rehype-pretty-code";
 import { ArrowLeft, Calendar, Tag } from "lucide-react";
 import type { BlogPost } from "@/lib/mdx";
 
-const mdxOptions = {
-  rehypePlugins: [
-    [
-      rehypePrettyCode,
-      {
-        theme: "github-dark-default",
-        keepBackground: true,
-      },
-    ],
-  ],
-};
-
-export function BlogArticle({ post }: { post: BlogPost }) {
+export function BlogHeader({ post }: { post: BlogPost }) {
   const t = useTranslations("blog");
 
   return (
-    <article className="mx-auto max-w-3xl px-6 pb-24 pt-32">
+    <>
       <Link
         href="/blog"
         className="mb-8 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -63,11 +49,6 @@ export function BlogArticle({ post }: { post: BlogPost }) {
           </div>
         )}
       </header>
-
-      <div className="prose prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-accent prose-strong:text-foreground prose-code:text-accent prose-pre:bg-[#0d1117] prose-pre:border prose-pre:border-border">
-        {/* @ts-expect-error async RSC component */}
-        <MDXRemote source={post.content} options={{ mdxOptions }} />
-      </div>
-    </article>
+    </>
   );
 }

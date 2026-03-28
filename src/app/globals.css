@@ -154,6 +154,110 @@ body {
   filter: drop-shadow(0 0 6px var(--brand));
 }
 
+.blog-content h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: var(--foreground);
+}
+
+.blog-content h2 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: var(--foreground);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.blog-content h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--foreground);
+}
+
+.blog-content p {
+  margin-bottom: 1rem;
+  line-height: 1.8;
+  color: var(--muted-foreground);
+}
+
+.blog-content ul, .blog-content ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  color: var(--muted-foreground);
+}
+
+.blog-content ul {
+  list-style: disc;
+}
+
+.blog-content ol {
+  list-style: decimal;
+}
+
+.blog-content li {
+  margin-bottom: 0.5rem;
+  line-height: 1.7;
+}
+
+.blog-content a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.blog-content a:hover {
+  text-decoration: underline;
+}
+
+.blog-content strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.blog-content code {
+  color: var(--accent);
+  font-size: 0.875rem;
+  font-family: var(--font-mono), monospace;
+  background: var(--muted);
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+}
+
+.blog-content pre {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  font-size: 0.875rem;
+}
+
+.blog-content pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+.blog-content blockquote {
+  border-left: 3px solid var(--accent);
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.blog-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
 .glass-card {
   background: var(--card);
   border: 1px solid var(--border);
