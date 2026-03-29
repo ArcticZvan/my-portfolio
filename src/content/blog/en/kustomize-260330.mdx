@@ -1,0 +1,274 @@
+---
+title: "From Helm to Kustomize: Reflections on ArgoCD in Practice"
+description: "A complete technical decision-making journey: setting up ArgoCD from scratch on K8s, transitioning from Helm Charts to Kustomize, and planning MCP-driven YAML automation."
+date: "2026-03-30"
+tags: ["GitOps", "ArgoCD", "K8s", "Kustomize", "CI/CD"]
+---
+
+## Background: Why GitOps
+
+Our team runs numerous microservices on Baidu Cloud CCE clusters. The previous deployment workflow was: CI builds the image, then ops manually runs `kubectl apply` or executes scripts. The problems were obvious:
+
+- **No audit trail**: Who changed what and when — all communicated verbally
+- **Not reproducible**: Cluster state drifted from the code repo; someone `kubectl edit`s a config and nobody knows
+- **Difficult rollbacks**: Issues meant trying to "remember the last working image tag" and manually reverting
+- **Multi-environment chaos**: Config differences between dev and prod scattered across scripts and notes
+
+The core idea of GitOps is simple: **the Git repository is the single source of truth for cluster state.** All changes go through Git commits, all deployments go through Git sync.
+
+## Overall Architecture Design
+
+After researching options, I chose **ArgoCD** as the GitOps engine. The final architecture looks like this:
+
+```
+Developer pushes code
+    → GitLab CI auto-builds image, pushes to Baidu Cloud CCR
+    → CI deploy stage auto-updates image tag in GitOps repo
+    → ArgoCD detects Git changes, status becomes OutOfSync
+    → Ops/dev manually clicks Sync in ArgoCD UI
+    → K8s rolling update completes
+```
+
+Three repositories are involved:
+
+1. Business code repo | Where developers write code daily
+
+2. cicd-templates | GitLab CI template library, standardizing "how to build" and "how to trigger deployment"
+
+3. gitops | Deployment config repo, standardizing "how to deploy," monitored by ArgoCD
+
+## Phase 1: Installing ArgoCD on CCE
+
+Baidu Cloud CCE doesn't ship with ArgoCD — manual installation is required. I chose Helm to install HA mode (using Helm to install ArgoCD itself is separate from whether business apps use Helm for deployment).
+
+Pitfalls encountered:
+
+**Image pull issues**: ArgoCD official images are on `quay.io`, which internal runners can't reach. The solution was to mirror all ArgoCD images to Baidu Cloud CCR private registry, then override `image.repository` in the values to point to CCR addresses.
+
+**Network connectivity**: ArgoCD Pods need access to our internal GitLab. Since DNS didn't resolve, I had to manually configure GitLab addresses in Pod `hostAliases`.
+
+**Redis HA**: Production can't run single-node Redis — configured 3-replica Sentinel + HAProxy mode. HAProxy images also needed mirroring to CCR.
+
+ArgoCD ended up running stably in the cluster's `argocd` namespace, exposed via Nginx Ingress for the Web UI.
+
+## Phase 2: Helm Chart Approach — The First "Working" Version
+
+Initially, I designed a generic Helm Chart to manage all microservices:
+
+```
+gitops/
+├── charts/microservice/        # One generic Helm Chart
+│   ├── templates/
+│   │   ├── deployment.yaml     # Go template syntax
+│   │   ├── service.yaml
+│   │   └── ingress.yaml
+│   └── values.yaml             # Defaults
+└── apps/gt-manage-server/
+    ├── dev/values.yaml          # dev environment overrides
+    └── prod/values.yaml         # prod environment overrides
+```
+
+The idea: write templates once, each service per environment only needs its own `values.yaml`. ArgoCD points to the Chart path + values file, automatically runs `helm template` to render final K8s resources.
+
+This approach did work. The CI deploy stage used `sed` to modify `image.tag` in values, ArgoCD detected the Git change and showed OutOfSync, manual Sync completed the deployment.
+
+**But I quickly discovered problems.**
+
+## Technical Reflection: Why Helm Didn't Fit Us
+
+### Problem 1: Templates Are a Black Box
+
+Helm templates use Go template syntax, like this:
+
+```yaml
+containers:
+  - name: {{ .Release.Name }}
+    image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+    {{- with .Values.env }}
+    env:
+      {{- toYaml . | nindent 12 }}
+    {{- end }}
+```
+
+The writer finds it elegant, but readers need to mentally compute "what does the final output look like." Debugging requires understanding template logic, cross-referencing values, then deducing the final YAML.
+
+### Problem 2: Shared Template Risks
+
+All microservices share one Chart. If one day a service needs `volumes`, a `sidecar`, or a switch to `StatefulSet`, modifying the template affects every service. While `{{- if }}` conditional rendering can provide compatibility, templates grow increasingly complex, eventually becoming a massive "universal template" — exactly what I wanted to avoid.
+
+### Problem 3: ArgoCD's Helm Rendering Isn't Transparent
+
+ArgoCD handles Helm by: `helm template` → get YAML → `kubectl apply`. What you see in Git isn't the final deployed resource, but "template + parameters." This somewhat deviates from GitOps' "Git IS the cluster state" philosophy.
+
+### Decision: Switch to Kustomize
+
+After weighing the trade-offs, I decided to switch to Kustomize. Core reasons:
+
+| Dimension | Helm | Kustomize |
+|-----------|------|-----------|
+| What's stored in Git | Templates + parameters | Near-final YAML |
+| Debugging | Requires understanding template syntax | Read YAML directly |
+| Shared baseline impact | Template changes affect all services | Each service has independent base |
+| Environment diff expression | values.yaml overrides | overlay + patch |
+| Learning curve | Go template | Almost no new syntax |
+
+## Phase 3: Kustomize Implementation
+
+### Directory Design
+
+Each service has its own independent `base` (baseline YAML) and `overlays` (environment differences), completely isolated between services:
+
+```
+apps/gt-manage-server/
+├── base/
+│   ├── deployment.yaml       # Static Deployment, directly readable
+│   ├── service.yaml          # Static Service
+│   └── kustomization.yaml
+└── overlays/
+    ├── dev/
+    │   ├── kustomization.yaml  # images.newTag + additional resources
+    │   └── ingress.yaml        # dev-specific Ingress
+    └── prod/
+        ├── kustomization.yaml  # images.newTag + patch
+        └── patch-deployment.yaml  # Replica count, resources, env var differences
+```
+
+`base/deployment.yaml` looks like this — pure static YAML, no template rendering needed:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neolix-gt-api-server-dev-ci
+  labels:
+    app: neolix-gt-api-server-dev-ci
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: neolix-gt-api-server-dev-ci
+  template:
+    spec:
+      containers:
+        - name: neolix-gt-api-server-dev-ci
+          image: ccr-xxx/data-platform/gt-manage-server:latest
+          ports:
+            - name: http
+              containerPort: 8000
+```
+
+`overlays/dev/kustomization.yaml` only needs to declare the image tag:
+
+```yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+  - ingress.yaml
+images:
+  - name: ccr-xxx/data-platform/gt-manage-server
+    newTag: "feat-cicd"
+```
+
+`overlays/prod/patch-deployment.yaml` uses Strategic Merge Patch to express environment differences:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neolix-gt-api-server-dev-ci
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: neolix-gt-api-server-dev-ci
+          env:
+            - name: ENV
+              value: "prod"
+          resources:
+            requests:
+              cpu: "1"
+              memory: "512Mi"
+            limits:
+              cpu: "2"
+              memory: "1Gi"
+```
+
+### CI Deploy Template Adaptation
+
+The CI deploy stage changed from "modify Helm values `tag:`" to "modify Kustomize overlay `newTag:`". The core logic change is minimal:
+
+```bash
+# Before (Helm)
+sed -i "s|^\(\s*tag:\s*\).*|\1\"${DEPLOY_TAG}\"|" values.yaml
+
+# Now (Kustomize)
+sed -i "s|^\(\s*newTag:\s*\).*|\1\"${DEPLOY_TAG}\"|" kustomization.yaml
+```
+
+The path changed from `apps/{app}/{env}/values.yaml` to `apps/{app}/overlays/{env}/kustomization.yaml`; authentication, retry, and branch mapping logic are fully reused.
+
+### ArgoCD Application Migration
+
+ArgoCD doesn't need installation changes — Kustomize is a built-in capability. Just point the Application's `source.path` to the overlay directory.
+
+But there's a gotcha: the old Application was created with Helm, and `kubectl apply` on the new YAML is a merge operation that won't clear residual `spec.source.helm` configuration. ArgoCD sees the helm config and continues processing in Helm mode, then reports a `Chart.yaml not found` error.
+
+**Solution**: `kubectl delete application` first, then `kubectl apply` to recreate, ensuring Helm config is completely cleared.
+
+Another thing to watch: resource name consistency. Helm uses `{{ .Release.Name }}` for all resource names, and ArgoCD defaults to using the Application name as the release name. If Kustomize resource names don't match Helm's rendered output, ArgoCD creates new resources instead of updating old ones. I compared Helm rendered output against Kustomize rendered output item by item to ensure full consistency during migration.
+
+## Phase 4 Planning: MCP-Driven YAML Automation
+
+After switching to Kustomize, "template capability" moved from runtime (Helm rendering) to generation time. This aligns perfectly with my planned MCP (Model Context Protocol) integration:
+
+**Let AI generate YAML by contract, instead of having Helm render templates at runtime.**
+
+Designed responsibility boundaries:
+
+| Operation | MCP Handles | CI Handles | Manual |
+|-----------|-------------|------------|--------|
+| Create new app base + overlays | Yes | — | — |
+| Update base structure | Yes | — | — |
+| Update overlay differences | Yes | — | — |
+| Update images.newTag (releases) | — | Yes | — |
+| ArgoCD Application management | — | — | Yes |
+
+MCP takes application metadata (name, image, ports, resources, env vars, etc.) as input and outputs the complete Kustomize directory. CI only handles updating `newTag` during routine releases. Manual intervention is only needed for structural changes.
+
+Benefits of this approach:
+
+- Service bases reuse template logic at generation time but are fully isolated at runtime
+- No risk of "shared template change affecting all services"
+- Git stores readable, static YAML
+- CI and ArgoCD logic stays extremely simple
+
+## Lessons Learned
+
+### On Technology Selection
+
+Don't choose Helm just because "it's mainstream." ArgoCD supports plain YAML, Kustomize, Helm, Jsonnet, and more. The key is your scenario:
+
+- High service variance, team unfamiliar with template syntax → Kustomize or plain YAML
+- Highly uniform services, need parameterization → Helm
+- Want to "see the final deployed YAML" → Kustomize
+
+### On Migration
+
+The actual work to migrate from Helm to Kustomize isn't huge, but several easily overlooked points:
+1. Resource naming must be consistent, otherwise orphan resources will be created
+2. ArgoCD Application's residual Helm config must be completely cleared
+3. CI deploy template paths and sed targets need updating
+4. Documentation must be updated in sync, otherwise newcomers will follow the old approach
+
+### On GitOps Value
+
+GitOps isn't just "managing config with Git" — more importantly, it establishes an **auditable, rollback-capable, reproducible** deployment system:
+
+- **Auditable**: Every deployment is a Git commit — who changed what is crystal clear
+- **Rollback-capable**: `git revert` or ArgoCD History Rollback — any version can be restored
+- **Reproducible**: A new cluster just needs to point to the same GitOps repo to restore all applications
+- **Drift-proof**: If someone `kubectl edit`s cluster config, ArgoCD immediately flags OutOfSync
+
+Once this system is running, deployment transforms from "ops' manual operations" to "developers' Git operations," achieving a quantum leap in both efficiency and reliability.

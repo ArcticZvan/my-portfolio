@@ -4,12 +4,14 @@ import { getBlogPost, getBlogPosts } from "@/lib/mdx";
 import { BlogHeader } from "@/components/blog/blog-header";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import rehypePrettyCode from "rehype-pretty-code";
+import remarkGfm from "remark-gfm";
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
 };
 
 const mdxOptions = {
+  remarkPlugins: [remarkGfm],
   rehypePlugins: [
     [
       rehypePrettyCode,
@@ -46,7 +48,7 @@ export default async function BlogPostPage({ params }: Props) {
   }
 
   return (
-    <article className="mx-auto max-w-3xl px-6 pb-24 pt-32">
+    <article className="mx-auto max-w-5xl px-6 pb-24 pt-32">
       <BlogHeader post={post} />
 
       <div className="glass-card p-6 md:p-10">

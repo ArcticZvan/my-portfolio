@@ -1,0 +1,274 @@
+---
+title: "从 Helm 到 Kustomize：ArgoCD 的实践与思考"
+description: "记录在K8S集群上，从零搭建 ArgoCD，经历 Helm Chart 方案后转向 Kustomize，并规划 MCP 自动化生成 YAML 的完整技术决策过程。"
+date: "2026-03-30"
+tags: ["GitOps", "ArgoCD", "K8s", "Kustomize", "CI/CD"]
+---
+
+## 背景：为什么要做 GitOps
+
+我们团队在百度云 CCE 集群上跑着非常多个微服务，之前的部署方式是 CI 构建完镜像后，运维手动 `kubectl apply` 或者跑脚本更新。问题很明显：
+
+- **没有审计**：谁改了什么、什么时候改的，全靠口头沟通
+- **不可重现**：集群状态和代码仓库脱节，有人 `kubectl edit` 改了配置没人知道
+- **回滚困难**：出问题只能"记得上次用的什么镜像"，然后手动改回去
+- **多环境混乱**：dev 和 prod 的配置差异散落在各种脚本和笔记里
+
+GitOps 的核心理念很简单：**Git 仓库是集群状态的唯一真实来源。** 所有变更走 Git commit，所有部署走 Git sync。
+
+## 整体架构设计
+
+经过调研，我选择了 **ArgoCD** 作为 GitOps 引擎。最终落地的架构是这样的：
+
+```
+开发者 push 代码
+    → GitLab CI 自动构建镜像，推送到百度云 CCR
+    → CI deploy 阶段自动更新 GitOps 仓库的镜像 tag
+    → ArgoCD 检测到 Git 变更，状态变为 OutOfSync
+    → 运维/开发在 ArgoCD UI 手动点击 Sync
+    → K8s 滚动更新完成
+```
+
+涉及三个仓库：
+
+1. 业务代码仓库 | 开发者日常写代码的地方 
+
+2. cicd-templates | GitLab CI 模板库，标准化"怎么构建"和"怎么触发部署" 
+
+3. gitops | 部署配置仓库，标准化"怎么部署"，ArgoCD 监控此仓库 
+
+## 第一阶段：在 CCE 上安装 ArgoCD
+
+百度云 CCE 不自带 ArgoCD，需要手动装。我选了 Helm 安装 HA 模式（ArgoCD 自身用 Helm 装和业务用不用 Helm 部署是两回事）。
+
+踩过的坑：
+
+**镜像拉取问题**：ArgoCD 官方镜像在 `quay.io`，内网 Runner 根本拉不到。解决方案是先把所有 ArgoCD 镜像同步到百度云 CCR 私有仓库，然后在 values 里把 `image.repository` 全部指向 CCR 地址。
+
+**网络连通**：ArgoCD Pod 需要能访问我们的内网 GitLab。由于 DNS 不通，得在 Pod 的 `hostAliases` 里手动配 GitLab 地址。
+
+**Redis HA**：生产环境不能用单节点 Redis，配了 3 副本 Sentinel + HAProxy 模式。HAProxy 的镜像同样需要先同步到 CCR。
+
+最终 ArgoCD 稳定运行在集群的 `argocd` namespace 里，通过 Nginx Ingress 暴露 Web UI。
+
+## 第二阶段：Helm Chart 方案——第一个"能用"的版本
+
+最开始我设计了一套通用 Helm Chart 来管理所有微服务：
+
+```
+gitops/
+├── charts/microservice/        # 一套通用 Helm Chart
+│   ├── templates/
+│   │   ├── deployment.yaml     # Go 模板语法
+│   │   ├── service.yaml
+│   │   └── ingress.yaml
+│   └── values.yaml             # 默认值
+└── apps/gt-manage-server/
+    ├── dev/values.yaml          # dev 环境覆盖
+    └── prod/values.yaml         # prod 环境覆盖
+```
+
+思路是：模板写一次，每个服务每个环境只需要提供自己的 `values.yaml` 就行。ArgoCD 指向 Chart 路径 + values 文件，自动 `helm template` 渲染出最终的 K8s 资源。
+
+这个方案确实能跑通。CI 的 deploy 阶段用 `sed` 修改 values 里的 `image.tag`，ArgoCD 检测到 Git 变更后提示 OutOfSync，手动 Sync 就完成部署。
+
+**但我很快发现了问题。**
+
+## 技术反思：为什么 Helm 不适合我们
+
+### 问题一：模板是黑盒
+
+Helm 模板用 Go template 语法，类似这样：
+
+```yaml
+containers:
+  - name: {{ .Release.Name }}
+    image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+    {{- with .Values.env }}
+    env:
+      {{- toYaml . | nindent 12 }}
+    {{- end }}
+```
+
+写的人觉得很优雅，但看的人需要脑补"最终渲染出来长什么样"。出了问题排查时，得先理解模板逻辑，再对照 values，才能推断最终的 YAML。
+
+### 问题二：共享模板的隐患
+
+所有微服务共用一套 Chart。如果某天某个服务需要加 `volumes`、`sidecar` 或者换成 `StatefulSet`，改模板会影响所有服务。虽然可以用 `{{- if }}` 做条件渲染来兼容，但模板会越来越复杂，最后变成一个巨大的"万能模板"——这正是我想避免的。
+
+### 问题三：ArgoCD 的 Helm 渲染并不透明
+
+ArgoCD 对 Helm 的处理是：`helm template` → 拿到 YAML → `kubectl apply`。你在 Git 里看到的不是最终部署的资源，而是"模板 + 参数"。这和 GitOps "Git 就是集群状态"的理念有一定偏差。
+
+### 决策：切换到 Kustomize
+
+权衡之后我决定切到 Kustomize。核心理由：
+
+| 维度 | Helm | Kustomize |
+|------|------|-----------|
+| Git 里存的是什么 | 模板 + 参数 | 接近最终的 YAML |
+| 出问题时排查 | 需要理解模板语法 | 直接看 YAML |
+| 共享基线影响面 | 改模板影响全部服务 | 每服务独立 base，互不影响 |
+| 环境差异表达 | values.yaml 覆盖 | overlay + patch |
+| 学习成本 | Go template | 几乎不用学新语法 |
+
+## 第三阶段：Kustomize 方案落地
+
+### 目录设计
+
+每个服务有自己独立的 `base`（基准 YAML）和 `overlays`（环境差异），服务之间完全隔离：
+
+```
+apps/gt-manage-server/
+├── base/
+│   ├── deployment.yaml       # 静态 Deployment，可直接读懂
+│   ├── service.yaml          # 静态 Service
+│   └── kustomization.yaml
+└── overlays/
+    ├── dev/
+    │   ├── kustomization.yaml  # images.newTag + 额外资源
+    │   └── ingress.yaml        # dev 独有的 Ingress
+    └── prod/
+        ├── kustomization.yaml  # images.newTag + patch
+        └── patch-deployment.yaml  # 副本数、资源、环境变量差异
+```
+
+`base/deployment.yaml` 长这样——纯静态 YAML，不需要任何模板渲染：
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neolix-gt-api-server-dev-ci
+  labels:
+    app: neolix-gt-api-server-dev-ci
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: neolix-gt-api-server-dev-ci
+  template:
+    spec:
+      containers:
+        - name: neolix-gt-api-server-dev-ci
+          image: ccr-xxx/data-platform/gt-manage-server:latest
+          ports:
+            - name: http
+              containerPort: 8000
+```
+
+`overlays/dev/kustomization.yaml` 只需要声明镜像 tag：
+
+```yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+  - ingress.yaml
+images:
+  - name: ccr-xxx/data-platform/gt-manage-server
+    newTag: "feat-cicd"
+```
+
+`overlays/prod/patch-deployment.yaml` 用 Strategic Merge Patch 表达环境差异：
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neolix-gt-api-server-dev-ci
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: neolix-gt-api-server-dev-ci
+          env:
+            - name: ENV
+              value: "prod"
+          resources:
+            requests:
+              cpu: "1"
+              memory: "512Mi"
+            limits:
+              cpu: "2"
+              memory: "1Gi"
+```
+
+### CI Deploy 模板适配
+
+CI 的 deploy 阶段从"修改 Helm values 的 `tag:`"改为"修改 Kustomize overlay 的 `newTag:`"。核心逻辑变化很小：
+
+```bash
+# 之前（Helm）
+sed -i "s|^\(\s*tag:\s*\).*|\1\"${DEPLOY_TAG}\"|" values.yaml
+
+# 现在（Kustomize）
+sed -i "s|^\(\s*newTag:\s*\).*|\1\"${DEPLOY_TAG}\"|" kustomization.yaml
+```
+
+路径从 `apps/{app}/{env}/values.yaml` 变为 `apps/{app}/overlays/{env}/kustomization.yaml`，其余认证、重试、分支映射逻辑完全复用。
+
+### ArgoCD Application 迁移
+
+ArgoCD 不需要改安装配置——Kustomize 是内建能力。只需要把 Application 的 `source.path` 指向 overlay 目录即可。
+
+但这里有个坑：旧的 Application 是用 Helm 创建的，`kubectl apply` 新 YAML 是 merge 操作，不会清除残留的 `spec.source.helm` 配置。ArgoCD 看到 helm 配置就会继续按 Helm 模式处理，然后报 `Chart.yaml not found` 错误。
+
+**解决方法**：先 `kubectl delete application` 再 `kubectl apply` 重建，确保 Helm 配置彻底清除。
+
+另一个需要注意的是资源名一致性。Helm 用 `{{ .Release.Name }}` 作为所有资源名，ArgoCD 默认把 Application name 当 release name。如果 Kustomize 里的资源名和 Helm 渲染出来的不一致，ArgoCD 会创建新资源而不是更新旧资源。我通过逐项比对 Helm 渲染输出和 Kustomize 渲染输出，确保切换时完全一致。
+
+## 第四阶段规划：MCP 自动化 YAML 生成
+
+切到 Kustomize 后，"模板能力"从运行时（Helm 渲染）移到了生成时。这正好和我计划做的 MCP（Model Context Protocol）对接：
+
+**让 AI 按契约生成 YAML，而不是让 Helm 在运行时渲染模板。**
+
+设计的职责边界：
+
+| 操作 | MCP 负责 | CI 负责 | 人工负责 |
+|------|---------|---------|---------|
+| 新建应用 base + overlays | 是 | — | — |
+| 更新 base 结构 | 是 | — | — |
+| 更新 overlay 差异 | 是 | — | — |
+| 更新 images.newTag（发版） | — | 是 | — |
+| ArgoCD Application 管理 | — | — | 是 |
+
+MCP 输入应用元数据（名称、镜像、端口、资源、环境变量等），输出完整的 Kustomize 目录。CI 只负责日常发版时改 `newTag`。人工只在需要结构性变更时介入。
+
+这样做的好处是：
+
+- 服务之间的 base 在生成时复用模板逻辑，在运行时完全隔离
+- 不存在"改公共模板影响所有服务"的风险
+- Git 里存的是可读的静态 YAML
+- CI 和 ArgoCD 的逻辑都极其简单
+
+## 经验总结
+
+### 关于技术选型
+
+不要因为"Helm 是主流"就一定选 Helm。ArgoCD 支持纯 YAML、Kustomize、Helm、Jsonnet 等多种方式。关键是看你的场景：
+
+- 服务差异大、团队不熟模板语法 → Kustomize 或纯 YAML
+- 服务高度统一、需要参数化 → Helm
+- 想要"看得见最终部署的 YAML" → Kustomize
+
+### 关于迁移
+
+从 Helm 迁移到 Kustomize 的实际工作量不大，但有几个容易忽略的点：
+1. 资源命名必须一致，否则会产生孤儿资源
+2. ArgoCD Application 的 helm 残留配置必须清除干净
+3. CI deploy 模板的路径和 sed 目标都要更新
+4. 文档要同步更新，否则后来的人还是按旧方式操作
+
+### 关于 GitOps 的价值
+
+GitOps 不只是"用 Git 管配置"，更重要的是它建立了一套**可审计、可回滚、可重现**的部署体系：
+
+- **可审计**：每次部署都是一条 Git commit，谁改了什么一目了然
+- **可回滚**：`git revert` 或 ArgoCD History Rollback，任意版本都能回退
+- **可重现**：新集群只需指向同一个 GitOps 仓库，就能恢复全部应用
+- **防漂移**：有人 `kubectl edit` 改了集群配置，ArgoCD 会立刻提示 OutOfSync
+
+这套体系跑通后，部署从"运维的手动操作"变成了"开发的 Git 操作"，效率和可靠性都有了质的提升。

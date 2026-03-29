@@ -244,6 +244,37 @@ body {
   color: inherit;
 }
 
+.blog-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.875rem;
+  overflow-x: auto;
+  display: block;
+}
+
+.blog-content thead {
+  border-bottom: 2px solid var(--border);
+}
+
+.blog-content th {
+  text-align: left;
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+  color: var(--foreground);
+  white-space: nowrap;
+}
+
+.blog-content td {
+  padding: 0.5rem 1rem;
+  color: var(--muted-foreground);
+  border-bottom: 1px solid var(--border);
+}
+
+.blog-content tr:last-child td {
+  border-bottom: none;
+}
+
 .blog-content blockquote {
   border-left: 3px solid var(--accent);
   padding-left: 1rem;

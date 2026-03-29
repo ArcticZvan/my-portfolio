@@ -24,7 +24,7 @@ function BlogContent({
   const t = useTranslations("blog");
 
   return (
-    <div className="mx-auto max-w-4xl px-6 pb-24 pt-32">
+    <div className="mx-auto max-w-5xl px-6 pb-24 pt-32">
       <div className="mb-16 text-center">
         <h1 className="text-3xl font-bold md:text-4xl">
           <span className="gradient-text">{t("title")}</span>
