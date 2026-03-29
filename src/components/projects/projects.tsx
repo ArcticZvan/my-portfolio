@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ExternalLink, FolderOpen } from "lucide-react";
 import { GithubIcon } from "@/components/ui/icons";
+import Image from "next/image";
 import { projects } from "@/data/projects";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -76,9 +77,20 @@ export function Projects() {
               key={project.id}
               className="project-card glass-card group flex flex-col overflow-hidden transition-all hover:border-accent/40 hover:shadow-[0_0_20px_rgba(139,92,246,0.1)]"
             >
-              {/* Project image placeholder */}
-              <div className="flex h-48 items-center justify-center bg-muted/30">
-                <FolderOpen className="h-12 w-12 text-muted-foreground/30" />
+              <div className="relative h-48 overflow-hidden bg-muted/30">
+                {project.image ? (
+                  <Image
+                    src={project.image}
+                    alt={project.title[locale]}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center">
+                    <FolderOpen className="h-12 w-12 text-muted-foreground/30" />
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-1 flex-col p-5">

@@ -28,4 +28,5 @@ export const skills: Skill[] = [
   { name: "NumPy", icon: "/icons/numpy.svg", url: "https://numpy.org", color: "#4DABCF" },
   { name: "Pandas", icon: "/icons/pandas.svg", url: "https://pandas.pydata.org", color: "#150458" },
   { name: "MySQL", icon: "/icons/mysql.svg", url: "https://mysql.com", color: "#4479A1" },
+  { name: "Linux", icon: "/icons/linux.svg", url: "https://kernel.org", color: "#FCC624" },
 ];
