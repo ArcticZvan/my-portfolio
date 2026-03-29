@@ -37,7 +37,7 @@ export const projects: Project[] = [
     },
     image: "/images/dns-project.png",
     tags: ["Java", "DNS", "Networking", "Concurrency"],
-    github: "https://github.com/JPArcticZvan",
+    github: "https://github.com/JerryZhangZZY/DnsRelay",
     featured: true,
   },
   {
@@ -52,7 +52,7 @@ export const projects: Project[] = [
     },
     image: "/images/finance-project.png",
     tags: ["Java", "Maven", "Desktop App", "Software Engineering"],
-    github: "https://github.com/JPArcticZvan",
+    github: "https://github.com/JPArcticZvan/EBU6304SoftwareEngineeringGP",
     featured: true,
   },
 ];
