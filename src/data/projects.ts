@@ -11,21 +11,7 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    id: "project-1",
-    title: {
-      zh: "个人作品集网站",
-      en: "Personal Portfolio",
-    },
-    description: {
-      zh: "基于 Next.js 15 + TypeScript + Tailwind CSS 构建的个人作品集，支持中英双语、暗色模式和丰富的动画效果。",
-      en: "A personal portfolio built with Next.js 15, TypeScript, and Tailwind CSS, featuring bilingual support, dark mode, and rich animations.",
-    },
-    tags: ["Next.js", "TypeScript", "Tailwind CSS", "GSAP"],
-    github: "https://github.com/ArcticZvan/my-portfolio",
-    featured: true,
-  },
-  {
-    id: "project-2",
+    id: "project-eeg",
     title: {
       zh: "基于 AI 的脑电信号癫痫检测",
       en: "AI-Assisted Epilepsy Detection Using EEG Signals",
@@ -37,6 +23,36 @@ export const projects: Project[] = [
     image: "/images/eeg-project.png",
     tags: ["Python", "EEG", "Machine Learning", "Deep Learning"],
     github: "https://github.com/ArcticZvan/AI-Assisted-Epilepsy-detection-using-EEG-signals",
+    featured: true,
+  },
+  {
+    id: "project-dns",
+    title: {
+      zh: "DNS Relay 中继服务",
+      en: "DNS Relay Server",
+    },
+    description: {
+      zh: "基于 Java 实现的 UDP DNS 中继服务器，支持本地缓存命中、域名拦截与上游转发，手动解析 DNS 报文（RFC1035），采用线程池处理高并发查询。",
+      en: "A UDP-based DNS relay server built in Java, featuring local cache lookup, domain blocking, and upstream forwarding. Manually parses DNS packets per RFC1035 with thread pool concurrency.",
+    },
+    image: "/images/dns-project.png",
+    tags: ["Java", "DNS", "Networking", "Concurrency"],
+    github: "https://github.com/JPArcticZvan",
+    featured: true,
+  },
+  {
+    id: "project-finance",
+    title: {
+      zh: "个人财务管理系统",
+      en: "Financial Management Application",
+    },
+    description: {
+      zh: "基于 Java + Maven 构建的桌面端个人财务管理应用，支持收支记录、分类统计、数据可视化和报表导出，团队协作开发的软件工程课程项目。",
+      en: "A desktop financial management app built with Java and Maven, supporting income/expense tracking, categorized statistics, data visualization, and report export. A team-based software engineering course project.",
+    },
+    image: "/images/finance-project.png",
+    tags: ["Java", "Maven", "Desktop App", "Software Engineering"],
+    github: "https://github.com/JPArcticZvan",
     featured: true,
   },
 ];

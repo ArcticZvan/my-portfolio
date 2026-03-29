@@ -42,13 +42,13 @@
   },
   "projects": {
     "title": "Featured Projects",
-    "subtitle": "Some of my notable work",
+    "subtitle": "Some of my projects",
     "viewProject": "View Project",
     "viewCode": "View Source"
   },
   "blog": {
     "title": "Blog",
-    "subtitle": "Thoughts & daily sharing",
+    "subtitle": "Technical thoughts & daily sharing",
     "readMore": "Read More",
     "backToBlog": "Back to Blog"
   },
